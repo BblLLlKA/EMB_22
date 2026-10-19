@@ -74,7 +74,7 @@ void loop()
     currentState = fanOn;
   }
 
-  portEXIT_CRITICAL_ISR(&timerMux);
+  portEXIT_CRITICAL(&timerMux);
 
   if (update)
   {
