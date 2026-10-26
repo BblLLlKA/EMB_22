@@ -34,21 +34,21 @@ constexpr uint8_t kDigitPatterns[] = {
     0b01101111, // 9: A B C D F G
 };
 
-// Паттерн для прочерка "--" (активирован только сегмент G, индекс 6)
+// Pattern for dashes "--" (only segment G activated, index 6)
 constexpr uint8_t kDashPattern = 0b01000000;
 
-// Пины основного светофора и потенциометра
+// Pins for the main traffic light and potentiometer
 constexpr uint8_t POT_PIN = 5;
 constexpr uint8_t RED_PIN = 15;
 constexpr uint8_t YELLOW_PIN = 7;
 constexpr uint8_t GREEN_PIN = 6;
 
-// Интервалы аппаратных таймеров (в микросекундах)
-constexpr uint32_t kTrafficTimerIntervalUs = 250000; // 250 мс тики светофора
-constexpr uint32_t kScanTimerIntervalUs = 4000;      // 4 мс динамическая индикация дисплея
-constexpr uint32_t kPotTimerIntervalUs = 20000;      // 20 мс опрос потенциометра
+// Hardware timer intervals (in microseconds)
+constexpr uint32_t kTrafficTimerIntervalUs = 250000; // 250 ms traffic light ticks
+constexpr uint32_t kScanTimerIntervalUs = 4000;      // 4 ms dynamic display multiplexing
+constexpr uint32_t kPotTimerIntervalUs = 20000;      // 20 ms potentiometer polling
 
-// Перечисление состояний светофора
+// Traffic light state enumeration
 enum class LightColor
 {
     RED,
@@ -57,7 +57,7 @@ enum class LightColor
     GREEN_BLINK
 };
 
-// Глобальные переменные таймеров
+// Global timer variables
 hw_timer_t *gTrafficTimer = nullptr;
 hw_timer_t *gScanTimer = nullptr;
 hw_timer_t *gPotTimer = nullptr;
@@ -66,12 +66,12 @@ portMUX_TYPE gTimerMux = portMUX_INITIALIZER_UNLOCKED;
 volatile uint32_t gPendingTrafficTicks = 0;
 volatile uint32_t gPendingPotSamples = 0;
 
-// Общие переменные для дисплея, доступные из прерывания
+// Shared display variables accessible from the interrupt
 volatile uint8_t gDisplayValue = 0;
 volatile bool gShowDashes = false;
 volatile uint8_t gActiveDigit = 0;
 
-// ISR для дисплея: выводит либо цифры, либо прочерки (--), если gShowDashes == true
+// ISR for the display: outputs either digits or dashes (--), if gShowDashes == true
 void IRAM_ATTR onScanTimer()
 {
     for (uint8_t i = 0; i < sizeof(kDigitEnablePins); ++i)
@@ -129,7 +129,7 @@ uint32_t consumePendingCount(volatile uint32_t &pendingCounter)
     return count;
 }
 
-// Класс для потенциометра
+// Potentiometer class
 class Potentiometer
 {
     uint8_t pin;
@@ -178,7 +178,7 @@ public:
     }
 };
 
-// Класс светофора
+// Traffic light class
 class TrafficLightSystem
 {
     struct LightPinConfig
@@ -201,10 +201,10 @@ class TrafficLightSystem
     };
 
     StateInfo states[4] = {
-        {60}, // RED (15 сек)
-        {8},  // RED_YELLOW (2 сек)
-        {40}, // GREEN (10 сек)
-        {10}  // GREEN_BLINK (2.5 сек)
+        {60}, // RED (15 sec)
+        {8},  // RED_YELLOW (2 sec)
+        {40}, // GREEN (10 sec)
+        {10}  // GREEN_BLINK (2.5 sec)
     };
 
     int lastBrightness = -1;
@@ -336,14 +336,14 @@ public:
         return static_cast<uint8_t>((ticksRemaining + 3) / 4);
     }
 
-    // Возвращает true для состояний, где нужно выводить прочерки (RED_YELLOW и GREEN_BLINK)
+    // Returns true for states where dashes should be displayed (RED_YELLOW and GREEN_BLINK)
     bool shouldShowDashes() const
     {
         return (currentState == LightColor::RED_YELLOW || currentState == LightColor::GREEN_BLINK);
     }
 };
 
-// Глобальные объекты
+// Global objects
 Potentiometer pot(POT_PIN);
 TrafficLightSystem trafficLight(RED_PIN, YELLOW_PIN, GREEN_PIN);
 
@@ -399,7 +399,7 @@ void loop()
     int currentBrightness = pot.getBrightness();
     trafficLight.updateOutputs(currentBrightness);
 
-    // Передаем данные на дисплей
+    // Pass data to the display
     gDisplayValue = trafficLight.getRemainingSeconds();
     gShowDashes = trafficLight.shouldShowDashes();
 }
