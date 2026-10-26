@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "driver/ledc.h"
 
-// Конфигурация семисегментного дисплея
 constexpr uint8_t kSegmentPins[] = {
     10, // A
     11, // B
@@ -202,7 +201,7 @@ class TrafficLightSystem
     };
 
     StateInfo states[4] = {
-        {60}, // RED (10 сек)
+        {60}, // RED (15 сек)
         {8},  // RED_YELLOW (2 сек)
         {40}, // GREEN (10 сек)
         {10}  // GREEN_BLINK (2.5 сек)
@@ -381,7 +380,7 @@ void setup()
     timerAlarmWrite(gPotTimer, kPotTimerIntervalUs, true);
     timerAlarmEnable(gPotTimer);
 
-    Serial.printf("\nSetup successful (Dashes for Yellow & Green Blink)...\n");
+    Serial.printf("\nSetup successful\n");
 }
 
 void loop()
