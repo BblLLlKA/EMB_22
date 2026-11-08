@@ -2,6 +2,8 @@
 
 ## Overview
 
+https://youtube.com/shorts/j2IhM-2YLP8?feature=share
+
 This educational ESP32-S3 project combines a multiplexed seven-segment
 display, rotary encoder, passive buzzer and servo-operated lock. The first
 complete encoder entry sets the PIN; subsequent entries check it. Sounds
